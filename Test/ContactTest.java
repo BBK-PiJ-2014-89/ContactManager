@@ -2,9 +2,18 @@ package Test;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import Interface.Contact;
+
 public class ContactTest {
+	private Contact contact;
+	
+	@Before
+	public void init(){
+		contact=new ContactImpl("Saima");
+	}
 
 	@Test
 	public void testGetId() {
@@ -13,7 +22,7 @@ public class ContactTest {
 
 	@Test
 	public void testGetName() {
-		fail("Not yet implemented");
+		assertEquals("Saima", contact.getName());
 	}
 
 	@Test

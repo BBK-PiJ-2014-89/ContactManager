@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import Implementation.ContactImpl;
 import Interface.Contact;
 
 public class ContactTest {
@@ -12,12 +13,12 @@ public class ContactTest {
 	
 	@Before
 	public void init(){
-		contact=new ContactImpl("Saima");
+		contact=new ContactImpl(1,"Saima");
 	}
 
 	@Test
 	public void testGetId() {
-		fail("Not yet implemented");
+		assertEquals(1, contact.getId());
 	}
 
 	@Test
@@ -27,12 +28,14 @@ public class ContactTest {
 
 	@Test
 	public void testGetNotes() {
-		fail("Not yet implemented");
+		assertEquals("", contact.getNotes());
 	}
 
 	@Test
 	public void testAddNotes() {
-		fail("Not yet implemented");
+		contact.addNotes("new notes");
+		
+		assertEquals("new notes", contact.getNotes());
 	}
 
 }

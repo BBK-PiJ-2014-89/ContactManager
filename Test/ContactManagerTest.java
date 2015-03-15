@@ -2,9 +2,17 @@ package Test;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import Interface.*;
+
 public class ContactManagerTest {
+	
+	@Before
+	public void init(){
+		ContactManager cm=new ContactManagerImpl();
+	}
 
 	@Test
 	public void testAddFutureMeeting() {
@@ -53,7 +61,7 @@ public class ContactManagerTest {
 
 	@Test
 	public void testAddNewContact() {
-		fail("Not yet implemented");
+		
 	}
 
 	@Test

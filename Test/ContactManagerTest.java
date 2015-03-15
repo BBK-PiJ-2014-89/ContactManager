@@ -70,9 +70,11 @@ private ContactManager cm;
 		cm.addNewContact("Rustam", null);
 	}
 	
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void testGetContactsIntArray() {
-		fail("Not yet implemented");
+		cm.addNewContact("Rustam", "");
+		cm.addNewContact("Sam", "notes");
+		cm.getContacts(7,3);
 	}
 
 	@Test

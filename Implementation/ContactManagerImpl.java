@@ -1,6 +1,7 @@
 package Implementation;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,8 +12,12 @@ import Interface.Meeting;
 import Interface.PastMeeting;
 
 public class ContactManagerImpl implements ContactManager {
+private Set<Contact> contactSet;
+private Set<Integer> idSet;
 
 	public ContactManagerImpl() {
+		this.contactSet=new HashSet<Contact>();
+		this.idSet=new HashSet<Integer>();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -75,12 +80,28 @@ public class ContactManagerImpl implements ContactManager {
 	public void addNewContact(String name, String notes) {
 		if(name==null||notes==null){
 			throw new NullPointerException();
+		}else {
+			Contact temp=new ContactImpl(uniqueIDNo(), name);
+			temp.addNotes(notes);
+			contactSet.add(temp);
+		}
+	}
+	private int uniqueIDNo(){
+		int i=0;
+		while(true){
+			if(idSet.contains(i)) {
+				i++;
+			}
+			else {
+				idSet.add(i);
+				return i;
+			}
 		}
 	}
 
 	@Override
 	public Set<Contact> getContacts(int... ids) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

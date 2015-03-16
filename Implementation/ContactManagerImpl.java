@@ -119,8 +119,12 @@ private Set<Integer> idSet;
 
 	@Override
 	public Set<Contact> getContacts(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		if(name=="") throw new NullPointerException();
+		Set<Contact> tempSet=new HashSet<Contact>();
+		for(Contact c:contactSet){
+			if(c.getName()==name) tempSet.add(c);
+		}
+		return tempSet;
 	}
 
 	@Override

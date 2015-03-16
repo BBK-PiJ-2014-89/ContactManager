@@ -1,5 +1,6 @@
 package Implementation;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -101,8 +102,18 @@ private Set<Integer> idSet;
 
 	@Override
 	public Set<Contact> getContacts(int... ids) {
-		
-		return null;
+		Set<Contact> tempSet = new HashSet<Contact>();
+		for (int i : ids) {
+			if (!idSet.contains(i)) {
+				throw new IllegalArgumentException();
+			} else {
+				for (Contact c : contactSet) {
+					if (c.getId() == i)
+						tempSet.add(c);
+				}
+			}
+		}
+		return tempSet;
 	}
 
 	@Override

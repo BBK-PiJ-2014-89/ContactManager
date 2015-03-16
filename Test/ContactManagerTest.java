@@ -69,12 +69,19 @@ private ContactManager cm;
 	public void testAddNewContact_notesExeptionHandling() {
 		cm.addNewContact("Rustam", null);
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testGetContactsIntArray() {
+	@Test
+	public void testAddContac_IDNumberTest() {
 		cm.addNewContact("Rustam", "");
 		cm.addNewContact("Sam", "notes");
-		cm.getContacts(7,3);
+		cm.addNewContact("Saima", "notes");
+		cm.getContacts(1,0,2);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetContactsIntArray_exeptionHandling() {
+		cm.addNewContact("Rustam", "");
+		cm.addNewContact("Sam", "notes");
+		cm.getContacts(1,8,3);
 	}
 
 	@Test

@@ -105,7 +105,19 @@ private ContactManager cm;
 	
 	@Test
 	public void testGetContactsString() {
-		fail("Not yet implemented");
+		cm.addNewContact("Rustam", "");
+		cm.addNewContact("Sam", "notes");
+		cm.addNewContact("Saima", "notes");
+		cm.addNewContact("Rustam", "notes");
+		
+		ArrayList<Contact> array=new ArrayList<>();
+		for(Contact c:cm.getContacts("Rustam")){
+			array.add(c);
+		}
+		
+		assertEquals(0, array.get(0).getId());
+		assertEquals(3, array.get(1).getId());
+		
 	}
 
 	@Test

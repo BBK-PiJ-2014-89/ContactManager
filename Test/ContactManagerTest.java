@@ -102,7 +102,14 @@ private ContactManager cm;
 		assertEquals(3, array.get(2).getId());
 
 	}
-	
+	@Test(expected=NullPointerException.class)
+	public void testGetContactsString_exeptionHandling() {
+		cm.addNewContact("Rustam", "");
+		cm.addNewContact("Sam", "notes");
+		cm.addNewContact("Saima", "notes");
+		cm.addNewContact("Rustam", "notes");
+		cm.getContacts("");
+	}
 	@Test
 	public void testGetContactsString() {
 		cm.addNewContact("Rustam", "");
@@ -117,7 +124,6 @@ private ContactManager cm;
 		
 		assertEquals(0, array.get(0).getId());
 		assertEquals(3, array.get(1).getId());
-		
 	}
 
 	@Test

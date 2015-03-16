@@ -2,6 +2,9 @@ package Test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,6 +87,22 @@ private ContactManager cm;
 		cm.getContacts(1,8,3);
 	}
 
+	@Test
+	public void testGetContactsIntArray_output(){
+		cm.addNewContact("Rustam", "");
+		cm.addNewContact("Sam", "notes");
+		cm.addNewContact("Saima", "notes");
+		cm.addNewContact("Rossie", "notes");
+		
+		ArrayList<Contact> array=new ArrayList<>();
+		for(Contact c:cm.getContacts(3,0,1)){
+			array.add(c);
+		}
+		assertEquals("Rustam", array.get(0).getName());
+		assertEquals(3, array.get(2).getId());
+
+	}
+	
 	@Test
 	public void testGetContactsString() {
 		fail("Not yet implemented");

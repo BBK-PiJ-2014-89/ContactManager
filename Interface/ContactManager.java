@@ -102,8 +102,6 @@ public interface ContactManager {
 	Set<Contact> getContacts(int... ids);
 	/**
 	* Returns a list with the contacts whose name contains that string.
-	the past.
-	correspond to the IDs.
 	*
 	* @param name the string to search for
 	* @return a list with the contacts whose name contains that string.

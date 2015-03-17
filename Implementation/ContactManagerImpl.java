@@ -1,26 +1,98 @@
 package Implementation;
 
-import java.lang.reflect.Array;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import Interface.Contact;
-import Interface.ContactManager;
-import Interface.FutureMeeting;
-import Interface.Meeting;
-import Interface.PastMeeting;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import Interface.*;
+
 
 public class ContactManagerImpl implements ContactManager {
 private Set<Contact> contactSet;
 private Set<Integer> idSet;
+private ArrayList<Integer> currentIDBeforeFlush=new ArrayList<Integer>();
+private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	public ContactManagerImpl() {
 		this.contactSet=new HashSet<Contact>();
 		this.idSet=new HashSet<Integer>();
-		// TODO Auto-generated constructor stub
+		File file=new File(CONTACTS_FILE_PATH);
+		
+		if(!file.exists())creatXML();			
+		
+		loadXML();
+
+	}
+	private void loadXML(){
+		try {
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.parse(CONTACTS_FILE_PATH);
+			
+			doc.getDocumentElement().normalize();
+			
+			NodeList nl=doc.getElementsByTagName("uniqueID");
+			
+			for(int i=0;i<nl.getLength();i++){
+				Node node=nl.item(i);	
+				if(node.getNodeType()==Node.ELEMENT_NODE){
+					
+					Element e=(Element) node;					
+					String notes=e.getElementsByTagName("notes").item(0).getTextContent();
+					Contact c=new ContactImpl(Integer.parseInt(e.getAttribute("id")), e.getElementsByTagName("name").item(0).getTextContent());
+					c.addNotes(notes);
+					
+					idSet.add(Integer.parseInt(e.getAttribute("id")));
+					currentIDBeforeFlush.add(Integer.parseInt(e.getAttribute("id")));
+					contactSet.add(c);
+				}
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	private void creatXML(){
+		try{
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.newDocument();
+			
+			Element contact=doc.createElement("contact");
+			doc.appendChild(contact);
+			
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			StreamResult result = new StreamResult(new File(CONTACTS_FILE_PATH));	 
+			transformer.transform(source, result);
+		}catch(ParserConfigurationException pce){
+			pce.printStackTrace();
+		}catch (TransformerException te){
+			te.printStackTrace();
+		}
 	}
 
 	@Override
@@ -129,7 +201,59 @@ private Set<Integer> idSet;
 
 	@Override
 	public void flush() {
-		// TODO Auto-generated method stub
+		saveConatacts();
+	}
+	
+	private void saveConatacts(){
+		try {
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.parse(CONTACTS_FILE_PATH);
+			
+			Node contact=doc.getFirstChild();
+			boolean flag=false;
+			for (Contact c:contactSet){
+				for(int i:currentIDBeforeFlush){
+					if(i==c.getId()) flag=true;
+				}
+				if(flag==false){
+						Element uniqueID=doc.createElement("uniqueID");
+						contact.appendChild(uniqueID);
+						uniqueID.setAttribute("id", c.getId()+"");
+						
+						Element name=doc.createElement("name");
+						name.appendChild(doc.createTextNode(c.getName()));
+						uniqueID.appendChild(name);
+						
+						Element notes=doc.createElement("notes");
+						notes.appendChild(doc.createTextNode(c.getNotes()));
+						uniqueID.appendChild(notes);
+						
+						currentIDBeforeFlush.add(c.getId());
+				}else flag=false;
 
+			}
+			
+			TransformerFactory tf=TransformerFactory.newInstance();
+			Transformer t=tf.newTransformer();
+			DOMSource source=new DOMSource(doc);
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			StreamResult result=new StreamResult(new File(CONTACTS_FILE_PATH));
+			t.transform(source, result);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+	public static void main(String[] args) {
+		ContactManagerImpl cm=new ContactManagerImpl();
+		cm.addNewContact("Ali", "Notes");
+		//cm.print();
+		System.out.println("*************");
+		cm.flush();
+		cm.addNewContact("Anar", "");
+		cm.flush();
 	}
 }

@@ -2,10 +2,12 @@ package Test;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
+import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import Implementation.ContactImpl;
 import Implementation.ContactManagerImpl;
 import Interface.*;
 
@@ -17,9 +19,26 @@ private ContactManager cm;
 		cm=new ContactManagerImpl();
 	}
 
-	@Test
-	public void testAddFutureMeeting() {
-		fail("Not yet implemented");
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddFutureMeeting_exeption_Date() {
+		Set<Contact> contacts=new HashSet<Contact>();
+		contacts.add(new ContactImpl(5, "Ali"));
+		Calendar date=new GregorianCalendar(2015,2,15);
+		cm.addFutureMeeting(contacts, date);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddFutureMeeting_exeption_Contacts() {
+		
+		cm.addNewContact("Ali", "");
+		cm.addNewContact("Jim", "nil");	
+		Set<Contact> contacts=cm.getContacts("ali");
+
+		//cm.flush();
+		//contacts.add(new ContactImpl(0, "Ali"));
+		
+		Calendar date=new GregorianCalendar(2015,2,20);
+		cm.addFutureMeeting(contacts, date);
 	}
 
 	@Test

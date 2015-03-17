@@ -1,11 +1,8 @@
 package Implementation;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +15,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import Interface.*;
 
@@ -35,10 +33,10 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		
 		if(!file.exists())creatXML();			
 		
-		loadXML();
+		loadContactsXML();
 
 	}
-	private void loadXML(){
+	private void loadContactsXML(){
 		try {
 			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
 			DocumentBuilder db=dbf.newDocumentBuilder();
@@ -63,8 +61,12 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 				}
 			}
 			
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -93,7 +95,28 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-		// TODO Auto-generated method stub
+		Calendar cal = new GregorianCalendar();
+		Date currentDate=cal.getTime();
+		Date appointmentDate=date.getTime();
+		if(currentDate.after(appointmentDate)){
+			throw new IllegalArgumentException();
+		}
+		boolean flag=false;
+		System.out.println("before Contacts check ");
+
+		for(Contact c:contacts){
+			for(Contact d:contactSet){
+				System.out.println("c: "+c.getId()+"|"+c.getName()+"|"+c.getNotes());
+				System.out.println("d: "+d.getId()+"|"+d.getName()+"|"+d.getNotes()+"\n");
+
+				if(c.equals(d)) {
+					System.out.println("flag=true");
+
+					flag=true;
+				}
+			}
+			if(flag==false)throw new IllegalArgumentException();
+		}
 		return 0;
 	}
 
@@ -151,8 +174,8 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		if(name==null||notes==null){
 			throw new NullPointerException();
 		}else {
-			Contact temp=new ContactImpl(uniqueIDNo(), name);
-			temp.addNotes(notes);
+			Contact temp=new ContactImpl(uniqueIDNo(), name, notes);
+			//temp.addNotes(notes);
 			contactSet.add(temp);
 		}
 	}
@@ -238,8 +261,14 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 			StreamResult result=new StreamResult(new File(CONTACTS_FILE_PATH));
 			t.transform(source, result);
 			
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

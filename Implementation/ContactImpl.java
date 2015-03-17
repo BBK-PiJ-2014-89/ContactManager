@@ -6,7 +6,12 @@ public class ContactImpl implements Contact {
 private String name;
 private String notes="";
 private int id;
-
+	
+	public ContactImpl(int id, String name,String notes){
+		this.name=name;
+		this.id=id;
+		this.notes=notes;
+	}
 	public ContactImpl(int id, String name) {
 		this.name=name;
 		this.id=id;
@@ -14,7 +19,7 @@ private int id;
 
 	@Override
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	@Override
@@ -29,7 +34,12 @@ private int id;
 
 	@Override
 	public void addNotes(String notes) {
-		this.notes=notes;
+		if(notes.equals("")) {
+			this.notes=notes;
+		}
+		else {
+			this.notes=this.notes+", "+notes;
+		}
 	}
 
 }

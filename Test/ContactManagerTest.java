@@ -21,8 +21,8 @@ private ContactManager cm;
 		cm.addNewContact("Saima", "nil");
 		cm.addNewContact("Jim", "");
 		
-		//cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01));
-		//cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
+		cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01));
+		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -40,12 +40,8 @@ private ContactManager cm;
 	}
 	@Test
 	public void testAddFutureMeeting() {
-		Calendar cal1=new GregorianCalendar(2015,03,01);
-		cm.addFutureMeeting(cm.getContacts(0), cal1);
-		//cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
-		
 		Calendar date=new GregorianCalendar(2015,3,20);
-		assertEquals(3,cm.addFutureMeeting(cm.getContacts(1), date));
+		assertEquals(2,cm.addFutureMeeting(cm.getContacts(1), date));
 	}
 
 	@Test
@@ -60,7 +56,7 @@ private ContactManager cm;
 
 	@Test
 	public void testGetMeeting() {
-		
+		assertNull(cm.getMeeting(11));
 	}
 
 	@Test

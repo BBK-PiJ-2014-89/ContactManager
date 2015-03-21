@@ -55,8 +55,13 @@ private ContactManager cm;
 	}
 
 	@Test
-	public void testGetMeeting() {
+	public void testGetMeeting_Null() {
 		assertNull(cm.getMeeting(11));
+	}
+	@Test
+	public void testGetMeeting() {
+		//contacts with id 2 and 0 are in meeting with id 0
+		assertEquals(cm.getContacts(0,2), cm.getMeeting(0).getContacts());
 	}
 
 	@Test

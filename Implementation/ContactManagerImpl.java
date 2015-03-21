@@ -123,7 +123,10 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public Meeting getMeeting(int id) {
-		
+		for(Meeting m:meetingSet){
+			if(m.getId()==id)
+				return m;
+		}
 		return null;
 	}
 

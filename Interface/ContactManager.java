@@ -31,7 +31,7 @@ public interface ContactManager {
 	/**
 	* Returns the meeting with the requested ID, or null if it there is none
 	* @param id the ID for the meeting
-	* @return the meeting with the requested ID, or null if it there is
+	* @return the meeting with the requested ID, or null if it there is none
 	*/
 	Meeting getMeeting(int id);
 	

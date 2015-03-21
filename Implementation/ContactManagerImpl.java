@@ -22,20 +22,23 @@ import Interface.*;
 
 public class ContactManagerImpl implements ContactManager {
 private Set<Contact> contactSet;
-private Set<Integer> idSet;
+private Set<Integer> uniqueContactIDSet;
+private Set<Meeting> meetingSet;
+private int uniqueMeetingIDSet;
 private ArrayList<Integer> currentIDBeforeFlush=new ArrayList<Integer>();
 private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	public ContactManagerImpl() {
 		this.contactSet=new HashSet<Contact>();
-		this.idSet=new HashSet<Integer>();
+		this.uniqueContactIDSet=new HashSet<Integer>();
+		this.meetingSet=new HashSet<Meeting>();
 		File file=new File(CONTACTS_FILE_PATH);
 		
 		if(!file.exists())creatXML();			
 		
 		loadContactsXML();
-
 	}
+	
 	private void loadContactsXML(){
 		try {
 			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
@@ -55,7 +58,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 					Contact c=new ContactImpl(Integer.parseInt(e.getAttribute("id")), e.getElementsByTagName("name").item(0).getTextContent());
 					c.addNotes(notes);
 					
-					idSet.add(Integer.parseInt(e.getAttribute("id")));
+					uniqueContactIDSet.add(Integer.parseInt(e.getAttribute("id")));
 					currentIDBeforeFlush.add(Integer.parseInt(e.getAttribute("id")));
 					contactSet.add(c);
 				}
@@ -95,29 +98,15 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-		Calendar cal = new GregorianCalendar();
-		Date currentDate=cal.getTime();
-		Date appointmentDate=date.getTime();
-		if(currentDate.after(appointmentDate)){
-			throw new IllegalArgumentException();
-		}
-		boolean flag=false;
-		System.out.println("before Contacts check ");
-
-		for(Contact c:contacts){
-			for(Contact d:contactSet){
-				System.out.println("c: "+c.getId()+"|"+c.getName()+"|"+c.getNotes());
-				System.out.println("d: "+d.getId()+"|"+d.getName()+"|"+d.getNotes()+"\n");
-
-				if(c.equals(d)) {
-					System.out.println("flag=true");
-
-					flag=true;
-				}
-			}
-			if(flag==false)throw new IllegalArgumentException();
-		}
-		return 0;
+		FutureMeeting temp;
+		Calendar currentDate=Calendar.getInstance();
+		if(currentDate.after(date)) throw new IllegalArgumentException("Meeting date is set in the past");
+		if(!contactSet.containsAll(contacts)) throw new IllegalArgumentException("Unknown Contact");
+		
+			temp=new FutureMeetingImpl(uniqueMeetingIDNo(), date, contacts);
+			meetingSet.add(temp);
+		
+		return temp.getId();
 	}
 
 	@Override
@@ -134,7 +123,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public Meeting getMeeting(int id) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -174,29 +163,31 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		if(name==null||notes==null){
 			throw new NullPointerException();
 		}else {
-			Contact temp=new ContactImpl(uniqueIDNo(), name, notes);
-			//temp.addNotes(notes);
+			Contact temp=new ContactImpl(uniqueContactIDNo(), name, notes);
 			contactSet.add(temp);
 		}
 	}
-	private int uniqueIDNo(){
+	private int uniqueContactIDNo(){
 		int i=0;
 		while(true){
-			if(idSet.contains(i)) {
+			if(uniqueContactIDSet.contains(i)) {
 				i++;
 			}
 			else {
-				idSet.add(i);
+				uniqueContactIDSet.add(i);
 				return i;
 			}
 		}
+	}
+	private int uniqueMeetingIDNo(){
+		return uniqueMeetingIDSet++;
 	}
 
 	@Override
 	public Set<Contact> getContacts(int... ids) {
 		Set<Contact> tempSet = new HashSet<Contact>();
 		for (int i : ids) {
-			if (!idSet.contains(i)) {
+			if (!uniqueContactIDSet.contains(i)) {
 				throw new IllegalArgumentException();
 			} else {
 				for (Contact c : contactSet) {

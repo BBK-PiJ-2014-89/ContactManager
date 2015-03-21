@@ -7,8 +7,7 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import Implementation.ContactImpl;
-import Implementation.ContactManagerImpl;
+import Implementation.*;
 import Interface.*;
 
 public class ContactManagerTest {
@@ -17,28 +16,36 @@ private ContactManager cm;
 	@Before
 	public void init(){
 		cm=new ContactManagerImpl();
+		cm.addNewContact("Ali", "");
+		cm.addNewContact("Jim", "nil");	
+		cm.addNewContact("Saima", "nil");
+		cm.addNewContact("Jim", "");
+		
+		//cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01));
+		//cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddFutureMeeting_exeption_Date() {
-		Set<Contact> contacts=new HashSet<Contact>();
-		contacts.add(new ContactImpl(5, "Ali"));
-		Calendar date=new GregorianCalendar(2015,2,15);
-		cm.addFutureMeeting(contacts, date);
+		
+		Calendar date=new GregorianCalendar(2014,02,15);
+		cm.addFutureMeeting(cm.getContacts(1), date);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddFutureMeeting_exeption_Contacts() {
 		
-		cm.addNewContact("Ali", "");
-		cm.addNewContact("Jim", "nil");	
-		Set<Contact> contacts=cm.getContacts("ali");
-
-		//cm.flush();
-		//contacts.add(new ContactImpl(0, "Ali"));
+		Calendar date=new GregorianCalendar(2015,3,20);
+		cm.addFutureMeeting(cm.getContacts(11), date);
+	}
+	@Test
+	public void testAddFutureMeeting() {
+		Calendar cal1=new GregorianCalendar(2015,03,01);
+		cm.addFutureMeeting(cm.getContacts(0), cal1);
+		//cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
 		
-		Calendar date=new GregorianCalendar(2015,2,20);
-		cm.addFutureMeeting(contacts, date);
+		Calendar date=new GregorianCalendar(2015,3,20);
+		assertEquals(3,cm.addFutureMeeting(cm.getContacts(1), date));
 	}
 
 	@Test
@@ -53,7 +60,7 @@ private ContactManager cm;
 
 	@Test
 	public void testGetMeeting() {
-		fail("Not yet implemented");
+		
 	}
 
 	@Test

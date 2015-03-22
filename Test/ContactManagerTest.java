@@ -70,7 +70,7 @@ private ContactManager cm;
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureMeetingListContact_exeption() {
-		cm.getFutureMeetingList(cm.getContacts("Jim").iterator().next());
+		cm.getFutureMeetingList(new ContactImpl(33, "Tim"));
 	}
 	
 	@Test

@@ -137,13 +137,12 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) {
-		if(!contactSet.contains(contact)){
-			System.out.println(contact.getName());
-			throw new IllegalArgumentException("Contact does not exist");
-		}
 		List<Meeting> list=new ArrayList<Meeting>();
 		for(Meeting m:meetingList){
 			if(m.getContacts().contains(contact)) list.add(m);
+		}
+		if(list.isEmpty()){
+			throw new IllegalArgumentException("Contact does not exist");
 		}
 		return list;
 	}

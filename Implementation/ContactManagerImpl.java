@@ -117,7 +117,15 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
-		// TODO Auto-generated method stub
+		Calendar cal=Calendar.getInstance();
+		for(Meeting m: meetingSet){
+			if(id==m.getId()){
+				if(cal.before(m.getDate())){
+					return (FutureMeeting) m;
+				}
+				else throw new IllegalArgumentException("Meeting id is not in the future");
+			}
+		}
 		return null;
 	}
 

@@ -2,8 +2,6 @@ package Implementation;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -158,8 +156,15 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 			if(dateCompare(m.getDate(), date)) {
 				list.add(m);
 			}
-		
 		}
+		if (list.size()==0)return null;
+		//Collections for sorting the list by time
+		Collections.sort(list, new Comparator<Meeting>() {
+			@Override
+			public int compare(Meeting o1, Meeting o2) {	
+				return (o1.getDate()).compareTo((o2.getDate()));
+			}	
+		});
 		return list;
 	}
 	private boolean dateCompare(Calendar date1, Calendar date2){

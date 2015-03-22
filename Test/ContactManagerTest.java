@@ -68,9 +68,15 @@ private ContactManager cm;
 		assertEquals(cm.getContacts(0,2), cm.getMeeting(0).getContacts());
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetFutureMeetingListContact_exeption() {
+		cm.getFutureMeetingList(cm.getContacts("Tim").iterator().next());
+	}
+	
 	@Test
 	public void testGetFutureMeetingListContact() {
-		fail("Not yet implemented");
+		List<Meeting> list= cm.getFutureMeetingList(cm.getContacts("Ali").iterator().next());
+		assertEquals(0, list.get(0).getId());//Ali is in meeting with id 0
 	}
 
 	@Test

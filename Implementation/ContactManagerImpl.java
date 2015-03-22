@@ -139,7 +139,9 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 		List<Meeting> list=new ArrayList<Meeting>();
 		for(Meeting m:meetingList){
-			if(m.getContacts().contains(contact)) list.add(m);
+			if(m.getContacts().contains(contact)&&getFutureMeeting(m.getId())!=null) {
+				list.add(m);
+			}
 		}
 		if(list.isEmpty()){
 			throw new IllegalArgumentException("Contact does not exist");

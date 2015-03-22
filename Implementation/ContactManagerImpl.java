@@ -157,8 +157,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 	}
 
 	@Override
-	public void addNewPastMeeting(Set<Contact> contacts, Calendar date,
-			String text) {
+	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
 		// TODO Auto-generated method stub
 
 	}

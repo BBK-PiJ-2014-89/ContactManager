@@ -55,7 +55,7 @@ private ContactManager cm;
 	}
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureMeeting_exeption() {
-		assertNull(cm.getFutureMeeting(11));
+		cm.getFutureMeeting(11);//TODO : need to add add addNewPastMeeting first 
 	}
 
 	@Test

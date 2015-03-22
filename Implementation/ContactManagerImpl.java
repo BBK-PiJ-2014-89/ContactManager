@@ -23,7 +23,7 @@ import Interface.*;
 public class ContactManagerImpl implements ContactManager {
 private Set<Contact> contactSet;
 private Set<Integer> uniqueContactIDSet;
-private Set<Meeting> meetingSet;
+private List<Meeting> meetingList;
 private int uniqueMeetingIDSet;
 private ArrayList<Integer> currentIDBeforeFlush=new ArrayList<Integer>();
 private final String CONTACTS_FILE_PATH="contacts.xml";
@@ -31,11 +31,10 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 	public ContactManagerImpl() {
 		this.contactSet=new HashSet<Contact>();
 		this.uniqueContactIDSet=new HashSet<Integer>();
-		this.meetingSet=new HashSet<Meeting>();
+		this.meetingList=new ArrayList<Meeting>();
+		
 		File file=new File(CONTACTS_FILE_PATH);
-		
 		if(!file.exists())creatXML();			
-		
 		loadContactsXML();
 	}
 	
@@ -102,10 +101,8 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		Calendar currentDate=Calendar.getInstance();
 		if(currentDate.after(date)) throw new IllegalArgumentException("Meeting date is set in the past");
 		if(!contactSet.containsAll(contacts)) throw new IllegalArgumentException("Unknown Contact");
-		
-			temp=new FutureMeetingImpl(uniqueMeetingIDNo(), date, contacts);
-			meetingSet.add(temp);
-		
+		temp=new FutureMeetingImpl(uniqueMeetingIDNo(), date, contacts);
+		meetingList.add(temp);
 		return temp.getId();
 	}
 
@@ -118,7 +115,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
 		Calendar cal=Calendar.getInstance();
-		for(Meeting m: meetingSet){
+		for(Meeting m: meetingList){
 			if(id==m.getId()){
 				if(cal.before(m.getDate())){
 					return (FutureMeeting) m;
@@ -131,7 +128,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public Meeting getMeeting(int id) {
-		for(Meeting m:meetingSet){
+		for(Meeting m:meetingList){
 			if(m.getId()==id)
 				return m;
 		}
@@ -140,8 +137,15 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) {
-		// TODO Auto-generated method stub
-		return null;
+		if(!contactSet.contains(contact)){
+			System.out.println(contact.getName());
+			throw new IllegalArgumentException("Contact does not exist");
+		}
+		List<Meeting> list=new ArrayList<Meeting>();
+		for(Meeting m:meetingList){
+			if(m.getContacts().contains(contact)) list.add(m);
+		}
+		return list;
 	}
 
 	@Override
@@ -211,7 +215,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public Set<Contact> getContacts(String name) {
-		if(name=="") throw new NullPointerException();
+		if(name==""||name==null) throw new NullPointerException();
 		Set<Contact> tempSet=new HashSet<Contact>();
 		for(Contact c:contactSet){
 			if(c.getName()==name) tempSet.add(c);

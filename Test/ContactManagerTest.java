@@ -70,7 +70,7 @@ private ContactManager cm;
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureMeetingListContact_exeption() {
-		cm.getFutureMeetingList(cm.getContacts("Tim").iterator().next());
+		cm.getFutureMeetingList(cm.getContacts("Jim").iterator().next());
 	}
 	
 	@Test
@@ -161,9 +161,5 @@ private ContactManager cm;
 		assertEquals(3, array.get(1).getId());
 	}
 
-	@Test
-	public void testFlush() {
-		fail("Not yet implemented");
-	}
 
 }

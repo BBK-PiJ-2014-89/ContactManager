@@ -21,8 +21,8 @@ private ContactManager cm;
 		cm.addNewContact("Saima", "nil");
 		cm.addNewContact("Jim", "");
 		
-		cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01));
-		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23));
+		cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01, 14, 30));
+		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23, 11, 20));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -80,8 +80,20 @@ private ContactManager cm;
 	}
 
 	@Test
+	public void testGetFutureMeetingListCalendar_null() {
+		assertNull(cm.getFutureMeetingList(new GregorianCalendar(2015, 04, 02, 14, 0)));
+	}
+	
+	@Test
 	public void testGetFutureMeetingListCalendar() {
-		fail("Not yet implemented");
+		cm.addFutureMeeting(cm.getContacts(1), new GregorianCalendar(2016, 03, 05, 9, 00));
+		cm.addFutureMeeting(cm.getContacts(0), new GregorianCalendar(2016, 03, 05, 16, 30));
+		cm.addFutureMeeting(cm.getContacts(1,3), new GregorianCalendar(2016, 03, 05, 10, 00));
+		
+		assertEquals(2, cm.getFutureMeetingList(new GregorianCalendar(2016, 03, 05)).get(0).getId());
+		assertEquals(4, cm.getFutureMeetingList(new GregorianCalendar(2016, 03, 05)).get(1).getId());
+		assertEquals(3, cm.getFutureMeetingList(new GregorianCalendar(2016, 03, 05)).get(2).getId());
+
 	}
 
 	@Test

@@ -51,7 +51,11 @@ private ContactManager cm;
 
 	@Test
 	public void testGetFutureMeeting() {
-		fail("Not yet implemented");
+		assertNull(cm.getFutureMeeting(11));
+	}
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetFutureMeeting_exeption() {
+		assertNull(cm.getFutureMeeting(11));
 	}
 
 	@Test

@@ -2,6 +2,8 @@ package Implementation;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -151,8 +153,21 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Calendar date) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Meeting> list=new ArrayList<Meeting>();
+		for(Meeting m:meetingList){
+			if(dateCompare(m.getDate(), date)) {
+				list.add(m);
+			}
+		
+		}
+		return list;
+	}
+	private boolean dateCompare(Calendar date1, Calendar date2){
+		boolean flag = true;
+		if(date1.get(Calendar.YEAR )!=date2.get(Calendar.YEAR)) flag=false;
+		if(date1.get(Calendar.MONTH )!=date2.get(Calendar.MONTH)) flag=false;
+		if(date1.get(Calendar.DAY_OF_MONTH )!=date2.get(Calendar.DAY_OF_MONTH)) flag=false;
+		return flag;
 	}
 
 	@Override

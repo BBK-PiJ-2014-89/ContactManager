@@ -246,8 +246,16 @@ private final String MEETINGS_FILE_PATH="meetings.xml";
 
 	@Override
 	public List<PastMeeting> getPastMeetingList(Contact contact) {
-		// TODO Auto-generated method stub
-		return null;
+		List<PastMeeting> list=new ArrayList<PastMeeting>();
+		for(Meeting m:meetingList){
+			if(m.getContacts().contains(contact)&&getPastMeeting(m.getId())!=null) {
+				list.add((PastMeeting) m);
+			}
+		}
+		if(list.isEmpty()){
+			throw new IllegalArgumentException("Contact does not exist");
+		}
+		return list;
 	}
 
 	@Override
@@ -416,6 +424,23 @@ private final String MEETINGS_FILE_PATH="meetings.xml";
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) {
+		ContactManager cm=new ContactManagerImpl();
+		cm.addNewContact("Ali", "");
+		cm.addNewContact("Jim", "nil");	
+		cm.addNewContact("Saima", "nil");
+		cm.addNewContact("Jim", "");
+		
+		cm.addFutureMeeting(cm.getContacts(3,0), new GregorianCalendar(2015,03,01, 14, 30));
+		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 03,23, 11, 20));
+		
+		System.out.println(cm.getMeeting(0).getDate().get(Calendar.YEAR));
+		
+		
+		System.out.println(cm.getFutureMeetingList(cm.getContacts(0).iterator().next() ).get(0).getDate()  );
+		//cm.flush();
 	}
 
 }

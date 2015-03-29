@@ -101,9 +101,9 @@ private ContactManager cm;
 
 	}
 
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void testGetPastMeetingList() {
-		fail("Not yet implemented");
+		cm.getPastMeetingList(cm.getContacts(1).iterator().next());
 	}
 
 	@Test

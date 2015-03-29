@@ -24,18 +24,22 @@ public class ContactManagerImpl implements ContactManager {
 private Set<Contact> contactSet;
 private Set<Integer> uniqueContactIDSet;
 private List<Meeting> meetingList;
-private int uniqueMeetingIDSet;
+private int uniqueMeetingIDSeq;
 private ArrayList<Integer> currentIDBeforeFlush=new ArrayList<Integer>();
 private final String CONTACTS_FILE_PATH="contacts.xml";
+private final String MEETINGS_FILE_PATH="meetings.xml";
 
 	public ContactManagerImpl() {
 		this.contactSet=new HashSet<Contact>();
 		this.uniqueContactIDSet=new HashSet<Integer>();
 		this.meetingList=new ArrayList<Meeting>();
 		
-		File file=new File(CONTACTS_FILE_PATH);
-		if(!file.exists())creatXML();			
+		File contactsFile=new File(CONTACTS_FILE_PATH);
+		File meetingsFile=new File(MEETINGS_FILE_PATH);
+
+		if(!contactsFile.exists()||!meetingsFile.exists())creatXML();			
 		loadContactsXML();
+		loadMeetingsXML();
 	}
 	
 	private void loadContactsXML(){
@@ -71,6 +75,45 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 			e.printStackTrace();
 		}
 	}
+	private void loadMeetingsXML(){
+		try {
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.parse(MEETINGS_FILE_PATH);
+			doc.getDocumentElement().normalize();
+			NodeList nl=doc.getElementsByTagName("uniqueID");
+			uniqueMeetingIDSeq=nl.getLength();
+			for(int i=0;i<nl.getLength();i++){
+				Node node=nl.item(i);
+				if(node.getNodeType()==Node.ELEMENT_NODE){
+					Element e=(Element)node;
+					int id=Integer.parseInt(e.getAttribute("id"));
+					int year=Integer.parseInt(e.getElementsByTagName("year").item(0).getTextContent());
+					int month=Integer.parseInt(e.getElementsByTagName("month").item(0).getTextContent());
+					int day=Integer.parseInt(e.getElementsByTagName("day").item(0).getTextContent());
+					int hour=Integer.parseInt(e.getElementsByTagName("hour").item(0).getTextContent());
+					int min=Integer.parseInt(e.getElementsByTagName("min").item(0).getTextContent());
+					
+					boolean flag=true;
+					int counter=0;
+					int[] contacts = new int[100] ;
+					while(flag){
+						contacts[counter]=Integer.parseInt(e.getElementsByTagName("contacts").item(counter).getTextContent());
+						counter++;
+						if(e.getElementsByTagName("contacts").item(counter)==null) flag=false;
+					}
+					meetingList.add(new MeetingImpl(id, new GregorianCalendar(year, month, day, hour, min), getContacts(contacts)));
+
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	private void creatXML(){
 		try{
@@ -93,6 +136,27 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		}catch (TransformerException te){
 			te.printStackTrace();
 		}
+		
+		try{
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.newDocument();
+			
+			Element meeting=doc.createElement("meeting");
+			doc.appendChild(meeting);
+			
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			StreamResult result = new StreamResult(new File(MEETINGS_FILE_PATH));	 
+			transformer.transform(source, result);
+		}catch(ParserConfigurationException pce){
+			pce.printStackTrace();
+		}catch (TransformerException te){
+			te.printStackTrace();
+		}
 	}
 
 	@Override
@@ -100,7 +164,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		FutureMeeting temp;
 		Calendar currentDate=Calendar.getInstance();
 		if(currentDate.after(date)) throw new IllegalArgumentException("Meeting date is set in the past");
-		if(!contactSet.containsAll(contacts)) throw new IllegalArgumentException("Unknown Contact");
+		if(!contactSet.containsAll(contacts)) throw new IllegalArgumentException("Unknown Contact");		
 		temp=new FutureMeetingImpl(uniqueMeetingIDNo(), date, contacts);
 		meetingList.add(temp);
 		return temp.getId();
@@ -108,7 +172,12 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public PastMeeting getPastMeeting(int id) {
-		// TODO Auto-generated method stub
+		if(getFutureMeeting(id)!=null) throw new IllegalArgumentException("The ID for the meeting is in the future");
+		for(Meeting m: meetingList){
+			if(id==m.getId()){
+				return (PastMeeting) m;
+			}
+		}
 		return null;
 	}
 
@@ -215,7 +284,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		}
 	}
 	private int uniqueMeetingIDNo(){
-		return uniqueMeetingIDSet++;
+		return uniqueMeetingIDSeq++;
 	}
 
 	@Override
@@ -246,15 +315,14 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 
 	@Override
 	public void flush() {
-		saveConatacts();
+		saveContacts();
+		saveMeetings();
 	}
-	
-	private void saveConatacts(){
+	private void saveContacts(){
 		try {
 			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
 			DocumentBuilder db=dbf.newDocumentBuilder();
 			Document doc=db.parse(CONTACTS_FILE_PATH);
-			
 			Node contact=doc.getFirstChild();
 			boolean flag=false;
 			for (Contact c:contactSet){
@@ -276,9 +344,7 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 						
 						currentIDBeforeFlush.add(c.getId());
 				}else flag=false;
-
 			}
-			
 			TransformerFactory tf=TransformerFactory.newInstance();
 			Transformer t=tf.newTransformer();
 			DOMSource source=new DOMSource(doc);
@@ -286,7 +352,6 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			StreamResult result=new StreamResult(new File(CONTACTS_FILE_PATH));
 			t.transform(source, result);
-			
 		} catch (TransformerException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -294,6 +359,61 @@ private final String CONTACTS_FILE_PATH="contacts.xml";
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void saveMeetings(){
+		try {
+			DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+			DocumentBuilder db=dbf.newDocumentBuilder();
+			Document doc=db.newDocument();
+			Element meeting=doc.createElement("meeting");
+			doc.appendChild(meeting);
+			
+			for(Meeting m:meetingList){
+				Element uniqueID=doc.createElement("uniqueID");
+				meeting.appendChild(uniqueID);
+				uniqueID.setAttribute("id", m.getId()+"");
+				
+				Element date=doc.createElement("date");
+				uniqueID.appendChild(date);
+				
+				Element dateYear=doc.createElement("year");
+				dateYear.appendChild(doc.createTextNode(m.getDate().get(Calendar.YEAR)+""));
+				date.appendChild(dateYear);
+				
+				Element dateMonth=doc.createElement("month");
+				dateMonth.appendChild(doc.createTextNode(m.getDate().get(Calendar.MONTH)+""));
+				date.appendChild(dateMonth);
+				
+				Element dateDay=doc.createElement("day");
+				dateDay.appendChild(doc.createTextNode(m.getDate().get(Calendar.DAY_OF_MONTH)+""));
+				date.appendChild(dateDay);
+				
+				Element dateHour=doc.createElement("hour");
+				dateHour.appendChild(doc.createTextNode(m.getDate().get(Calendar.HOUR_OF_DAY)+""));
+				date.appendChild(dateHour);
+				
+				Element dateMin=doc.createElement("min");
+				dateMin.appendChild(doc.createTextNode(m.getDate().get(Calendar.MINUTE)+""));
+				date.appendChild(dateMin);
+				
+				for (Contact id:m.getContacts()) {
+					Element contacts=doc.createElement("contacts");
+					contacts.appendChild(doc.createTextNode(id.getId()+""));
+					uniqueID.appendChild(contacts);
+				}				
+			}
+			TransformerFactory tf=TransformerFactory.newInstance();
+			Transformer t=tf.newTransformer();
+			DOMSource source=new DOMSource(doc);
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			StreamResult result=new StreamResult(new File(MEETINGS_FILE_PATH));
+			t.transform(source, result);
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
 	}

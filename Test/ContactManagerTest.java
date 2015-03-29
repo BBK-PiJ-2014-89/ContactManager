@@ -22,7 +22,7 @@ private ContactManager cm;
 		cm.addNewContact("Jim", "");
 		
 		cm.addFutureMeeting(cm.getContacts(2,0), new GregorianCalendar(2015,03,01, 14, 30));
-		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 02,23, 11, 20));
+		cm.addFutureMeeting(cm.getContacts("Saima"), new GregorianCalendar(2015, 03,23, 11, 20));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -40,14 +40,19 @@ private ContactManager cm;
 	}
 	@Test
 	public void testAddFutureMeeting() {
-		Calendar date=new GregorianCalendar(2015,3,20);
+		Calendar date=new GregorianCalendar(2015,3,29);
 		assertEquals(2,cm.addFutureMeeting(cm.getContacts(1), date));
 	}
 
 	@Test
-	public void testGetPastMeeting() {
-		fail("Not yet implemented");
+	public void testGetPastMeeting_null() {
+		assertNull(cm.getPastMeeting(4));
 	}
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetPastMeeting_exception() {
+		cm.getPastMeeting(1);
+	}
+	
 
 	@Test
 	public void testGetFutureMeeting() {
@@ -55,7 +60,7 @@ private ContactManager cm;
 	}
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureMeeting_exeption() {
-		cm.getFutureMeeting(11);//TODO : need to add add addNewPastMeeting first 
+		cm.getFutureMeeting(11);//TODO : need to add addNewPastMeeting first 
 	}
 
 	@Test
